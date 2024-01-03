@@ -1,0 +1,112 @@
+#!/bin/bash
+echo "Content-type: text/html"
+echo
+echo
+echo "<HTML><HEAD><TITLE>Now Playing</TITLE>"
+cat << EOF
+<style>
+div#buttons img:hover {
+  background-color: #eeee00;
+  color: white;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+tr:hover {background-color: #eeee00;}
+</style>
+EOF
+echo "</HEAD>"
+echo "<BODY onload=\"pageLoaded()\">"
+cat << EOF
+<script>
+function pageLoaded() {
+  showPL();
+  showPLSelect();
+}
+
+function showPLSelect() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    document.getElementById("playlists-select").innerHTML =
+    this.responseText;
+  }
+  xhttp.open("GET", "playlist_select_ajax");
+  xhttp.send();
+}
+
+function showPL() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    document.getElementById("playlist-div").innerHTML =
+    this.responseText;
+  }
+  xhttp.open("GET", "playlist_ajax");
+  xhttp.send();
+}
+function playPause() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "playpause_ajax");
+  xhttp.send();
+  var img = document.getElementById('playpause').src;
+        if (img.indexOf('pause.png')!=-1) {
+            document.getElementById('playpause').src  = '/images/buttons/play.png';
+        }
+         else {
+           document.getElementById('playpause').src = '/images/buttons/pause.png';
+       }
+}
+</script>
+EOF
+saveIFS=$IFS
+IFS='=&'
+parm=($QUERY_STRING)
+IFS=$saveIFS
+[[ $QUERY_STRING == "action=back" ]] && ./audtool playlist-reverse; sleep 2
+[[ $QUERY_STRING == "action=fwd" ]] && ./audtool playlist-advance; sleep 2
+#[[ $QUERY_STRING == "action=pause" ]] && ./audtool playback-pause
+[[ $QUERY_STRING == "action=play" ]] && ./audtool playback-play
+[[ $QUERY_STRING == playlist=* ]] && {
+	#echo "changing playlist"
+	pl_num=`echo $QUERY_STRING | sed 's|=| |g' | awk '{print $NF}'`	
+	re='^[0-9]+$'
+	#check if the input is numeric using reqular expression 're'
+	#https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
+	[[ $pl_num =~ $re ]] && {
+		./audtool set-current-playlist $pl_num
+		#echo "changed playlist to " $pl_num
+	}
+}
+current_song=$(./audtool current-song )
+playback_status=$(./audtool playback-status )
+echo "<H3>Current track: $current_song</H3>"
+#echo "<H5>$QUERY_STRING</H5>"
+playpause_image="/images/buttons/pause.png"
+[[ $playback_status == "playing" ]] || playpause_image="/images/buttons/play.png"
+cat << EOF
+<div id="buttons">
+<img id="reverse" src="/images/buttons/back.png">
+<!--
+<a href="?action=play"><img id="stopgo" src="/images/buttons/off.png"></a>
+-->
+<img id="playpause" onClick="playPause()" src="$playpause_image">
+<a href="?action=fwd"><img id="advance" src="/images/buttons/fwd.png"></a>
+</div>
+
+
+EOF
+#. ./playlist
+echo "<div id="playlists-select"></div>"
+echo "<div id="playlist-div"></div>"
+echo "</BODY></HTML>"
