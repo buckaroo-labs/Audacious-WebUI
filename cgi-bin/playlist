@@ -2,7 +2,7 @@
 echo "Content-type: text/html"
 echo
 echo
-echo '<table id="playlist">'
+echo '<table id="playlist_table">'
 echo '<tr><th>Artist - Album - Title</th><th>Run Time</th></tr>'
 #./audtool playlist-display | grep "|" | sed "s|\||\<\/td\>\<td\>|g" | sed 's|$|\</td></tr>|g' |  sed 's|^|\<tr onClick="jump(2)"><td>|g'
 

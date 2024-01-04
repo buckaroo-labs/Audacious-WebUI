@@ -163,6 +163,15 @@ function jump(song) {
 
 
 }
+function changePlaylist(value) {
+ const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "playlist_change?id=" + value);
+  xhttp.send();
+  xhttp.onload = function() {
+		showPL();
+		updateSong();
+	}
+}
 setInterval(updateSong, 10000);
 
 </script>

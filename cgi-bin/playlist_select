@@ -7,7 +7,7 @@ pl_dir=$AUDUSER_HOME/.config/audacious/playlists
 echo "<form action=\"nowplaying\">"
 cat << EOF
 <label style="font-size:2em;" for="playlist">Playlist:</label>
-<select style="font-size:2em;" name="playlist" id="pl-select">"
+<select onchange="changePlaylist(this.value)" style="font-size:2em;" name="playlist" id="pl-select">"
 EOF
 #for i in $(seq 1 $playlistcount)
 i=0
@@ -21,6 +21,6 @@ do
 done
 echo "</select>"
 cat << EOF
- <input style="font-size:2em;" type="submit" value="Change">
+<!-- <input style="font-size:2em;" type="submit" value="Change"> -->
 </form>
 EOF
