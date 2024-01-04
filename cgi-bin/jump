@@ -1,0 +1,16 @@
+#!/bin/bash
+echo "Content-type: text/html"
+echo
+echo
+echo '200 OK'
+[[ $QUERY_STRING == id=* ]] && {
+        pl_num=`echo $QUERY_STRING | sed 's|=| |g' | awk '{print $NF}'`
+        re='^[0-9]+$'
+        #check if the input is numeric using reqular expression 're'
+        #https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
+        [[ $pl_num =~ $re ]] && {
+                ./audtool playlist-jump $pl_num
+                #echo "changed playlist to " $pl_num
+        }
+}
+echo "200 OK"

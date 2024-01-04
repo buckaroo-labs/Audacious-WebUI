@@ -1,0 +1,12 @@
+#!/bin/bash
+echo "Content-type: text/html"
+echo
+echo
+echo '<table id="playlist">'
+echo '<tr><th>Artist - Album - Title</th><th>Run Time</th></tr>'
+#./audtool playlist-display | grep "|" | sed "s|\||\<\/td\>\<td\>|g" | sed 's|$|\</td></tr>|g' |  sed 's|^|\<tr onClick="jump(2)"><td>|g'
+
+./audtool playlist-display | grep "|" | sed 's|^|<tr onClick="jump(|' | sed 's/ | /)"><td>/' | sed 's/ | /\<\/td>\<td>/' | sed 's|$|\</td></tr>|'
+echo '</table>'
+
+

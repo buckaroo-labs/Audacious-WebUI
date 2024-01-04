@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "Content-type: text/html"
+echo
+echo
+current_status=$(./audtool playback-status)
+button_name="on"
+[[ $current_status == "stopped" ]] && button_name="off"
+echo $button_name

@@ -34,6 +34,9 @@ cat << EOF
 function pageLoaded() {
   showPL();
   showPLSelect();
+  showShuffle();
+  showRepeat();
+  showStopGo();
 }
 
 function showPLSelect() {
@@ -42,22 +45,65 @@ function showPLSelect() {
     document.getElementById("playlists-select").innerHTML =
     this.responseText;
   }
-  xhttp.open("GET", "playlist_select_ajax");
+  xhttp.open("GET", "playlist_select");
   xhttp.send();
 }
+function updateSong() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    document.getElementById("currenttrack").innerHTML =
+    this.responseText;
+  }
+  xhttp.open("GET", "currentsong");
+  xhttp.send();
 
+
+
+}
 function showPL() {
   const xhttp = new XMLHttpRequest();
   xhttp.onload = function() {
     document.getElementById("playlist-div").innerHTML =
     this.responseText;
   }
-  xhttp.open("GET", "playlist_ajax");
+  xhttp.open("GET", "playlist");
   xhttp.send();
+}
+function showStopGo() {
+ const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    document.getElementById("stopgo").src =
+    '/images/buttons/' + this.responseText.trim() + '.png';
+  }
+  xhttp.open("GET", "playbackstatus");
+  xhttp.send();
+
+}
+
+function showShuffle() {
+ const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    document.getElementById("shufflestatus").src =
+    '/images/buttons/' + this.responseText.trim() + '.png';
+  }
+  xhttp.open("GET", "shufflestatus");
+  xhttp.send();
+
+}
+function showRepeat() {
+ const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    document.getElementById("repeatstatus").src =
+    '/images/buttons/' + this.responseText.trim() + '.png';
+  }
+  xhttp.open("GET", "repeatstatus");
+  xhttp.send();
+
+
 }
 function playPause() {
   const xhttp = new XMLHttpRequest();
-  xhttp.open("GET", "playpause_ajax");
+  xhttp.open("GET", "playpause");
   xhttp.send();
   var img = document.getElementById('playpause').src;
         if (img.indexOf('pause.png')!=-1) {
@@ -67,6 +113,58 @@ function playPause() {
            document.getElementById('playpause').src = '/images/buttons/pause.png';
        }
 }
+
+function toggleStop() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "do_play");
+  xhttp.send();
+  var img = document.getElementById("stopgo").src;
+            document.getElementById("stopgo").src  = '/images/buttons/on.png';
+}
+function toggleShuffle() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "toggle_shuffle");
+  xhttp.send();
+  var img = document.getElementById("shufflestatus").src;
+        if (img.indexOf('on.png')!=-1) {
+            document.getElementById('shufflestatus').src  = '/images/buttons/shuffle-off.png';
+        }
+         else {
+           document.getElementById('shufflestatus').src = '/images/buttons/shuffle-on.png';
+       }
+}
+function toggleRepeat() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "toggle_repeat");
+  xhttp.send();
+  var img = document.getElementById('repeatstatus').src;
+        if (img.indexOf('on.png')!=-1) {
+            document.getElementById('repeatstatus').src  = '/images/buttons/repeat-off.png';
+        }
+         else {
+           document.getElementById('repeatstatus').src = '/images/buttons/repeat-on.png';
+       }
+}
+function advance() {  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "advance");
+  xhttp.send();
+  updateSong();
+}
+function reverse() {  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "reverse");
+  xhttp.send();
+  updateSong();
+}
+function jump(song) {
+ const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "jump?id=" + song);
+  xhttp.send();
+  updateSong();
+
+
+}
+setInterval(updateSong, 10000);
+
 </script>
 EOF
 saveIFS=$IFS
@@ -90,23 +188,21 @@ IFS=$saveIFS
 }
 current_song=$(./audtool current-song )
 playback_status=$(./audtool playback-status )
-echo "<H3>Current track: $current_song</H3>"
+echo "<H3 id="currenttrack">Current track: $current_song</H3>"
 #echo "<H5>$QUERY_STRING</H5>"
 playpause_image="/images/buttons/pause.png"
 [[ $playback_status == "playing" ]] || playpause_image="/images/buttons/play.png"
 cat << EOF
 <div id="buttons">
-<img id="reverse" src="/images/buttons/back.png">
-<!--
-<a href="?action=play"><img id="stopgo" src="/images/buttons/off.png"></a>
--->
-<img id="playpause" onClick="playPause()" src="$playpause_image">
-<a href="?action=fwd"><img id="advance" src="/images/buttons/fwd.png"></a>
+<img title="Previous" id="reverse" onClick="reverse()" src="/images/buttons/back.png">
+<img title="Play/Pause" id="playpause" onClick="playPause()" src="$playpause_image">
+<img title="Next" id="advance" onClick="advance()" src="/images/buttons/fwd.png">
+<br>
+<img title="Power" id="stopgo" onClick="toggleStop()">
+<img title="Shuffle" id="shufflestatus" onClick="toggleShuffle()">
+<img title="Repeat" id="repeatstatus" onClick="toggleRepeat()">
 </div>
-
-
 EOF
-#. ./playlist
 echo "<div id="playlists-select"></div>"
 echo "<div id="playlist-div"></div>"
 echo "</BODY></HTML>"
