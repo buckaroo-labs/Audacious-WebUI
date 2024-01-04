@@ -1,7 +1,0 @@
-#!/bin/bash
-echo "Content-type: text/html"
-echo
-echo
-./audtool playback-pause 
-echo '200 OK'
-
