@@ -5,8 +5,6 @@
 OUTFILE=/tmp/$RANDOM.out 
 ssh -q $AUDUSER@localhost 2>/dev/null << EOF > $OUTFILE
 audtool $1 $2
-#audtool current-song
 EOF
-#[[ $1 = "current-song" ]] && lines=1
-#tail -$lines ssh.out
+#skip all the SSH banners and echo the output from audtool
 tail -n +9 $OUTFILE
