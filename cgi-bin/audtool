@@ -1,6 +1,9 @@
 #!/bin/bash
+#This file is a wrapper for the audtool command. It assumes that audacious is runnning under
+# a different user ID than the web server.
+#The user running the web server will need passwordless ssh access to that other user.
 OUTFILE=/tmp/$RANDOM.out 
-ssh -q garde@localhost 2>/dev/null << EOF > $OUTFILE
+ssh -q $AUDUSER@localhost 2>/dev/null << EOF > $OUTFILE
 audtool $1 $2
 #audtool current-song
 EOF
