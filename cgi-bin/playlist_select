@@ -3,7 +3,7 @@ echo "Content-type: text/html"
 echo
 echo
 playlistname=$(./audtool current-playlist-name)
-pl_dir=/home/garde/.config/audacious/playlists
+pl_dir=$AUDUSER_HOME/.config/audacious/playlists
 echo "<form action=\"nowplaying\">"
 cat << EOF
 <label style="font-size:2em;" for="playlist">Playlist:</label>
